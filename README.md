@@ -2,6 +2,8 @@
 
 > **Travel Through Your Own Knowledge.**
 
+![ChronaAI Dashboard Mockup](docs/images/dashboard_mockup.png)
+
 ChronaAI is an original, production-grade Personal Digital Time Machine designed to record, understand, reconstruct, and predict your digital work history using local AI. 
 
 Unlike traditional note-taking tools, ChronaAI operates as a local **AI Memory Operating System** that runs directly on your machine. It continuously observes your work activity and automatically builds a semantic memory timeline, a knowledge graph, and search indices—remaining fully offline-capable, extensible, and privacy-first.
@@ -15,6 +17,8 @@ Unlike traditional note-taking tools, ChronaAI operates as a local **AI Memory O
 $$\text{Events} \longrightarrow \text{Knowledge} \longrightarrow \text{Relationships} \longrightarrow \text{Timeline} \longrightarrow \text{Graph} \longrightarrow \text{Insights} \longrightarrow \text{Predictions}$$
 
 Every file save, window switch, copy paste, or terminal command becomes a structured event that flows through our CQRS projections to feed your local timeline, knowledge graph, and vector search index.
+
+![ChronaAI Time Machine Semantic Pipeline](docs/images/timeline_visualization.png)
 
 ---
 
@@ -97,6 +101,8 @@ ChronaAI is built using **Clean Architecture** and **Domain-Driven Design (DDD)*
 * **File Location**: [`frontend/src/components/graph/GraphExplorer.tsx`](file:///d:/open+source+projects/Personal+Digital+Time-Machine/frontend/src/components/graph/GraphExplorer.tsx)
 * Custom HTML5 Canvas-based force-directed spring physics visualizer.
 * Connects Projects, Files, Tech nodes, and logged events. Drag nodes in real time to inspect edge relations.
+
+![Interactive Knowledge Graph Visualizer](docs/images/knowledge_graph_concept.png)
 
 ### 4. Memory Assistant Chat (Module 4)
 * **File Location**: [`frontend/src/components/search/SearchWorkspace.tsx`](file:///d:/open+source+projects/Personal+Digital+Time-Machine/frontend/src/components/search/SearchWorkspace.tsx)

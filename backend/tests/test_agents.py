@@ -84,3 +84,12 @@ def test_agent_api_endpoints():
     data_cre = res_creative.json()
     assert "duplicates" in data_cre
     assert "innovations" in data_cre
+
+    # 9. Test Brainstorm Endpoint
+    res_brainstorm = client.post("/api/v1/creative/brainstorm", json={"topic": "Micro-frontend security"})
+    assert res_brainstorm.status_code == 200
+    data_brain = res_brainstorm.json()
+    assert "title" in data_brain
+    assert "description" in data_brain
+    assert "reasoning" in data_brain
+

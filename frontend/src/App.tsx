@@ -9,6 +9,7 @@ import ProjectReplay from './components/projects/ProjectReplay';
 import PredictionsEvolution from './components/predictions/PredictionsEvolution';
 import ResearchDocs from './components/research/ResearchDocs';
 import AnalyticsReflections from './components/analytics/AnalyticsReflections';
+import CreativeProjects from './components/creative/CreativeProjects';
 import { 
   Clock, 
   Share2, 
@@ -31,7 +32,7 @@ function App() {
     resetFilters 
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'timeline' | 'graph' | 'predictions' | 'settings'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'graph' | 'search' | 'projects' | 'predictions' | 'research' | 'analytics' | 'settings' | 'creative'>('timeline');
 
   return (
     <div className="flex h-screen w-screen bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans overflow-hidden transition-colors duration-200">
@@ -122,6 +123,17 @@ function App() {
             >
               <Clock className="h-4 w-4 text-primary-500" />
               Research & Docs
+            </button>
+            <button 
+              onClick={() => setActiveTab('creative')}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
+                activeTab === 'creative' 
+                  ? 'bg-primary-500/10 text-primary-500 shadow-sm border border-primary-500/20' 
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400'
+              }`}
+            >
+              <Sparkles className="h-4 w-4 text-primary-500 animate-pulse" />
+              Creative Projects
             </button>
             <button 
               onClick={() => setActiveTab('analytics')}
@@ -230,6 +242,10 @@ function App() {
 
           {activeTab === 'analytics' && (
             <AnalyticsReflections />
+          )}
+
+          {activeTab === 'creative' && (
+            <CreativeProjects />
           )}
 
           {activeTab === 'settings' && (

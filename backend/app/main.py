@@ -628,8 +628,103 @@ def get_analytics():
 @app.get("/api/v1/creative")
 def get_creative():
     """Retrieve creative innovative ideas and redundancy alerts."""
-    from backend.app.infrastructure.agents.creative_agent import creative_agent
-    return creative_agent.detect_opportunities([], [])
+    db: Session = next(db_manager.get_db())
+    try:
+        logs = db.query(ActivityLog).all()
+        from backend.app.infrastructure.agents.creative_agent import creative_agent
+        return creative_agent.detect_opportunities(logs, [])
+    finally:
+        db.close()
+
+class BrainstormSchema(BaseModel):
+    topic: str
+
+@app.post("/api/v1/creative/brainstorm")
+def brainstorm_ideas(payload: BrainstormSchema):
+    """Brainstorms dynamic creative ideas for a given topic using local LLM."""
+    topic = payload.topic
+    
+    # 1. Fetch user's primary tech profile from logs
+    db: Session = next(db_manager.get_db())
+    primary_tech = "TypeScript"
+    try:
+        logs = db.query(ActivityLog).all()
+        tech_counts = {"Python": 0, "TypeScript": 0, "Rust": 0, "React": 0, "FastAPI": 0}
+        for log in logs:
+            app = log.app_name.lower()
+            title = log.window_title.lower() if log.window_title else ""
+            combined = f"{app} {title}"
+            if "python" in combined or ".py" in combined:
+                tech_counts["Python"] += 1
+            if "typescript" in combined or ".ts" in combined or ".tsx" in combined:
+                tech_counts["TypeScript"] += 1
+            if "rust" in combined or ".rs" in combined or "cargo" in combined:
+                tech_counts["Rust"] += 1
+            if "react" in combined:
+                tech_counts["React"] += 1
+            if "fastapi" in combined:
+                tech_counts["FastAPI"] += 1
+        if any(tech_counts.values()):
+            primary_tech = max(tech_counts, key=tech_counts.get)
+    except Exception:
+        pass
+    finally:
+        db.close()
+
+    # 2. Call local Ollama model to generate ideas
+    ollama_url = f"{settings.OLLAMA_API_URL}/api/generate"
+    prompt = (
+        "You are ChronaAI, a creative startup and open-source project ideator.\n"
+        f"The user wants to brainstorm project ideas around the topic: '{topic}'.\n"
+        f"Their primary programming language/stack is: {primary_tech}.\n\n"
+        "Generate a highly creative and original project concept that combines their tech stack with the requested topic.\n"
+        "Respond ONLY with a JSON object. Do not include markdown code block backticks (like ```json), just raw text. Structure:\n"
+        "{\n"
+        "  \"title\": \"Project Name\",\n"
+        "  \"description\": \"One sentence description of the idea.\",\n"
+        "  \"reasoning\": \"A short explanation of how this leverages their tech stack.\"\n"
+        "}"
+    )
+
+    used_ollama = False
+    result = {}
+    import urllib.request
+    try:
+        req = urllib.request.Request(
+            ollama_url,
+            data=json.dumps({
+                "model": settings.LLM_MODEL,
+                "prompt": prompt,
+                "stream": False
+            }).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=5.0) as res:
+            if res.status == 200:
+                res_data = json.loads(res.read().decode('utf-8'))
+                response_text = res_data.get("response", "").strip()
+                if response_text.startswith("```"):
+                    lines = response_text.splitlines()
+                    if lines[0].startswith("```"):
+                        lines = lines[1:]
+                    if lines[-1].startswith("```"):
+                        lines = lines[:-1]
+                    response_text = "\n".join(lines).strip()
+                result = json.loads(response_text)
+                used_ollama = True
+    except Exception:
+        pass
+
+    if not used_ollama or not result:
+        # Fallback generator
+        result = {
+            "title": f"Smart {topic} Orchestrator",
+            "description": f"An offline-first platform built with {primary_tech} to automate and analyze {topic} pipelines locally.",
+            "reasoning": f"Leverages your dominant expertise in {primary_tech} to build a zero-configuration local tool."
+        }
+
+    return result
 
 if __name__ == "__main__":
     # Start ASGI Web Server locally on standard port 8000
@@ -637,5 +732,5 @@ if __name__ == "__main__":
         "backend.app.main:app",
         host="127.0.0.1",
         port=8000,
-        reload=True
+        reload=False
     )

@@ -188,3 +188,10 @@ backend/.venv/Scripts/pytest backend/tests/
    npm run dev:frontend
    ```
    Navigate to `http://localhost:5173` to explore your Personal Digital Time Machine!
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+

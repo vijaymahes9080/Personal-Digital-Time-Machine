@@ -4,7 +4,7 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS ? '/Personal-Digital-Time-Machine/' : '/',
+  base: './',
   plugins: [react()],
   resolve: {
     alias: {
